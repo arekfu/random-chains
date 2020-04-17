@@ -23,8 +23,16 @@ fn main() {
                 .help("Number of independent samples"),
         )
         .arg(
-            Arg::with_name("max_size")
+            Arg::with_name("min_size")
                 .short("s")
+                .long("min-size")
+                .takes_value(true)
+                .default_value("0")
+                .help("Minimum size of each sample"),
+        )
+        .arg(
+            Arg::with_name("max_size")
+                .short("S")
                 .long("max-size")
                 .takes_value(true)
                 .default_value("100")

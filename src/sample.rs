@@ -13,6 +13,7 @@ pub struct Samples(pub Vec<Sample>);
 pub fn run(config: &Config) {
     let mut rng = thread_rng();
     let samples = make_samples(
+        config.min_size,
         config.max_size,
         config.replicas,
         config.budget,
@@ -49,6 +50,7 @@ fn expected(exp_min: f64, exp_max: f64) -> f64 {
 }
 
 fn make_samples<R>(
+    min_size: usize,
     max_size: usize,
     replicas: usize,
     max_total: f64,
@@ -61,24 +63,33 @@ where
 {
     Samples(
         (0..replicas)
-            .map(|_| sample(max_size, max_total, exp_min, exp_max, &mut rng))
+            .map(|_| sample(min_size, max_size, max_total, exp_min, exp_max, &mut rng))
             .collect(),
     )
 }
 
-fn sample<R>(max_size: usize, max_total: f64, exp_min: f64, exp_max: f64, rng: R) -> Sample
+fn sample<R>(
+    min_size: usize,
+    max_size: usize,
+    max_total: f64,
+    exp_min: f64,
+    exp_max: f64,
+    rng: R,
+) -> Sample
 where
     R: Rng,
 {
     let mut total = 0.0;
+    let mut size: usize = 0;
     let sample_vec: Vec<f64> = rng
         .sample_iter(power_law::VariablePowerLaw::new(exp_min, exp_max))
-        .take(max_size)
         .take_while(|x| {
-            let res = total < max_total;
+            let res = total < max_total && size < min_size;
             total += x;
+            size += 1;
             res
         })
+        .take(max_size)
         .collect();
     Sample(sample_vec)
 }
@@ -93,7 +104,7 @@ mod tests {
     fn check_max_size() {
         let mut rng = super::thread_rng();
         for _ in 0..N_REPLICAS {
-            let smpl = super::sample(10, f64::INFINITY, -3.0, -2.0, &mut rng);
+            let smpl = super::sample(0, 10, f64::INFINITY, -3.0, -2.0, &mut rng);
             assert_eq!(smpl.0.len(), 10, "sample = {:?}", smpl.0);
         }
     }
@@ -102,7 +113,7 @@ mod tests {
     fn check_max_1() {
         let mut rng = super::thread_rng();
         for _ in 0..N_REPLICAS {
-            let smpl = super::sample(10, 0.5, -3.0, -2.0, &mut rng);
+            let smpl = super::sample(0, 10, 0.5, -3.0, -2.0, &mut rng);
             assert_eq!(smpl.0.len(), 1);
         }
     }
@@ -111,7 +122,7 @@ mod tests {
     fn check_max_4() {
         let mut rng = super::thread_rng();
         for _ in 0..N_REPLICAS {
-            let smpl = super::sample(10, 3.5, -3.0, -2.0, &mut rng);
+            let smpl = super::sample(0, 10, 3.5, -3.0, -2.0, &mut rng);
             assert!(smpl.0.len() <= 4);
         }
     }
