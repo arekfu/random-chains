@@ -27,7 +27,7 @@ fn main() {
                 .short("s")
                 .long("min-size")
                 .takes_value(true)
-                .default_value("0")
+                .default_value("1")
                 .help("Minimum size of each sample"),
         )
         .arg(
@@ -61,6 +61,13 @@ fn main() {
                 .takes_value(true)
                 .default_value("10.0")
                 .help("Total computational budget"),
+        )
+        .arg(
+            Arg::with_name("score_method")
+                .long("score-method")
+                .takes_value(true)
+                .default_value("welford")
+                .help("Score method"),
         )
         .get_matches();
 

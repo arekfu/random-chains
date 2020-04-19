@@ -1,4 +1,5 @@
 use rand::{thread_rng, Rng};
+use std::iter::Iterator;
 
 use super::config::Config;
 use super::power_law;
@@ -21,17 +22,15 @@ pub fn run(config: &Config) {
         config.exponent_max,
         &mut rng,
     );
-    let sample_sizes = Samples(
-        samples
-            .0
-            .iter()
-            .map(|sample| Sample(vec![sample.0.len() as f64]))
-            .collect(),
-    );
-    let sample_sizes_mean = score::Score::from(&sample_sizes);
+    let sample_sizes = samples
+        .0
+        .iter()
+        .map(|sample| score::Observable::new(sample.0.len() as f64));
+    let sample_sizes_mean = score::Score::score(sample_sizes, &config.score_method);
     println!("sample sizes: {}", sample_sizes_mean);
 
-    let result = score::Score::from(&samples);
+    let values = samples.0.iter().map(score::Observable::score);
+    let result = score::Score::score(values, &config.score_method);
     let theoretical = expected(config.exponent_min, config.exponent_max);
     println!("\ntheoretical: {}", theoretical);
     println!("scored: {}", result);
@@ -84,7 +83,7 @@ where
     let sample_vec: Vec<f64> = rng
         .sample_iter(power_law::VariablePowerLaw::new(exp_min, exp_max))
         .take_while(|x| {
-            let res = total < max_total && size < min_size;
+            let res = total < max_total || size < min_size;
             total += x;
             size += 1;
             res

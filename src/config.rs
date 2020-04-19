@@ -2,6 +2,12 @@ use clap::ArgMatches;
 use std::fmt;
 
 #[derive(Debug)]
+pub enum ScoreMethod {
+    Welford,
+    Squares,
+}
+
+#[derive(Debug)]
 pub struct Config {
     pub replicas: usize,
     pub min_size: usize,
@@ -9,6 +15,7 @@ pub struct Config {
     pub exponent_min: f64,
     pub exponent_max: f64,
     pub budget: f64,
+    pub score_method: ScoreMethod,
 }
 
 impl Config {
@@ -27,6 +34,15 @@ impl Config {
             .parse::<f64>()
             .unwrap();
         let budget = matches.value_of("budget").unwrap().parse().unwrap();
+        let score_method_str = matches
+            .value_of("score_method")
+            .unwrap()
+            .to_ascii_lowercase();
+        let score_method = match score_method_str.as_ref() {
+            "welford" => ScoreMethod::Welford,
+            "squares" => ScoreMethod::Squares,
+            _ => panic!("Unrecognized score method: {}", score_method_str),
+        };
         Config {
             replicas,
             min_size,
@@ -34,6 +50,7 @@ impl Config {
             exponent_min,
             exponent_max,
             budget,
+            score_method,
         }
     }
 }
