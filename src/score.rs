@@ -22,6 +22,10 @@ impl Observable {
         let value = sample.0.iter().sum::<f64>() / sample.0.len() as f64;
         Observable { value }
     }
+    pub fn tot(sample: &Sample) -> Observable {
+        let value = sample.0.iter().sum::<f64>();
+        Observable { value }
+    }
 }
 
 impl Score {

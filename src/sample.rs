@@ -29,9 +29,16 @@ pub fn run(config: &Config) {
     let sample_sizes_mean = score::Score::score(sample_sizes, &config.score_method);
     println!("sample sizes: {}", sample_sizes_mean);
 
+    let sample_tots = samples.0.iter().map(score::Observable::tot);
+    let sample_tots_mean = score::Score::score(sample_tots, &config.score_method);
+    println!("sample tot: {}", sample_tots_mean);
+    println!("sample tot / sample sizes: {}", sample_tots_mean.mean / sample_sizes_mean.mean);
+
     let values = samples.0.iter().map(score::Observable::score);
     let result = score::Score::score(values, &config.score_method);
+
     let theoretical = expected(config.exponent_min, config.exponent_max);
+
     println!("\ntheoretical: {}", theoretical);
     println!("scored: {}", result);
     println!(
