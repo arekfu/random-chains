@@ -1,5 +1,5 @@
-use super::sample::Sample;
 use super::config::ScoreMethod;
+use super::sample::Sample;
 use std::fmt;
 use std::iter::Iterator;
 

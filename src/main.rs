@@ -1,6 +1,8 @@
 extern crate clap;
 use clap::{crate_version, App, Arg};
 
+extern crate rgsl;
+
 mod config;
 mod power_law;
 mod sample;
@@ -68,6 +70,13 @@ fn main() {
                 .takes_value(true)
                 .default_value("welford")
                 .help("Score method"),
+        )
+        .arg(
+            Arg::with_name("cutoff")
+                .long("cutoff")
+                .takes_value(true)
+                .default_value("10.0")
+                .help("Exponential cutoff"),
         )
         .get_matches();
 

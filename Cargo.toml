@@ -8,6 +8,7 @@ edition = "2018"
 clap = ">= 2.33.0"
 rand = ">= 0.7.3"
 rand_distr = ">= 0.2.2"
+GSL = "1.1"
 
 [dev-dependencies]
 assert_float_eq = ">= 1.1.3"

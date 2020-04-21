@@ -16,6 +16,7 @@ pub struct Config {
     pub exponent_max: f64,
     pub budget: f64,
     pub score_method: ScoreMethod,
+    pub cutoff: f64,
 }
 
 impl Config {
@@ -43,6 +44,7 @@ impl Config {
             "squares" => ScoreMethod::Squares,
             _ => panic!("Unrecognized score method: {}", score_method_str),
         };
+        let cutoff = matches.value_of("cutoff").unwrap().parse::<f64>().unwrap();
         Config {
             replicas,
             min_size,
@@ -51,6 +53,7 @@ impl Config {
             exponent_max,
             budget,
             score_method,
+            cutoff,
         }
     }
 }
